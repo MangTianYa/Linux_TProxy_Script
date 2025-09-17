@@ -1,0 +1,61 @@
+table inet proxy_rules {
+	set bypass_ipv4 {
+		type ipv4_addr
+		flags interval
+		elements = {
+                  0.0.0.0/8, 10.0.0.0/8,
+                  127.0.0.0/8, 192.168.0.0/16,
+                  169.254.0.0/16, 240.0.0.0/4,
+                  224.0.0.0/4, 172.16.0.0/12
+		}
+	}
+
+        set bypass_ipv6 {
+		type ipv6_addr
+		flags interval
+		elements = {
+                  ::/128,
+                  ::1/128,
+                  ::ffff:0:0/96,
+                  fc00::/7,
+                  fe80::/10,
+                  ff00::/8
+		}
+	}
+
+	set cnip4 {
+		type ipv4_addr
+		flags interval
+	}
+
+	set cnip6 {
+		type ipv6_addr
+		flags interval
+	}
+
+	chain prerouting {
+		type filter hook prerouting priority mangle; policy accept;
+		meta mark 0x00000001 goto proxy
+		ct direction reply return
+		ip daddr @bypass_ipv4 return
+		ip6 daddr @bypass_ipv6 return
+		ip daddr @cnip4 return
+		ip6 daddr @cnip6 return
+		goto proxy
+	}
+
+	chain output {
+		type route hook output priority mangle; policy accept;
+		meta mark 0x0000000a return
+		ct direction reply return
+		ip daddr @bypass_ipv4 return
+		ip6 daddr @bypass_ipv6 return
+		ip daddr @cnip4 return
+		ip6 daddr @cnip6 return
+		meta l4proto { tcp, udp } meta mark set 0x00000001 accept
+	}
+
+	chain proxy {
+		meta l4proto { tcp, udp } meta mark set 0x00000001 tproxy to :12345 accept
+	}
+}
