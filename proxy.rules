@@ -10,7 +10,7 @@ table inet proxy_rules {
 		}
 	}
 
-        set lan_ipv6 {
+    set lan_ipv6 {
 		type ipv6_addr
 		flags interval
 		elements = {
