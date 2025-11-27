@@ -10,7 +10,7 @@ nft flush set inet proxy_rules cn_ipv6
 
 # add ipv4
 awk '{ print $1 }' "$cn_ipv4" | xargs -n 1000 sh -c '
-    ipv4_addresses$(echo "$@" | tr " " ",")
+    ipv4_addresses=$(echo "$@" | tr " " ",")
     nft add element inet proxy_rules cn_ipv4 { $ipv4_addresses }
 ' sh
 
