@@ -56,6 +56,6 @@ table inet proxy_rules {
 	}
 
 	chain proxy {
-		meta l4proto { tcp, udp } meta mark set 0x00000001 tproxy to :12345 accept
+		meta l4proto { tcp, udp } meta mark set 0x00000001 tproxy to :2080 accept
 	}
 }
